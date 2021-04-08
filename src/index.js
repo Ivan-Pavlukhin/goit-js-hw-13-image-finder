@@ -1,15 +1,13 @@
 import './styles.css';
 import ImagesApiService from './apiService';
+import ScrollWindow from './scripts/windowAutoScroll';
 import formTpl from './handelbars/form-markup.hbs';
 import gallery from './handelbars/gallery-markup.hbs';
 import imageTpl from './handelbars/image-markup.hbs';
-
 const bodyRef = document.querySelector('body');
 
-const BASS_URL = 'https://pixabay.com/api/';
-
-const key = '21045573-d699147f44aaa00ba6588ddf4';
-const imagesApiService = new ImagesApiService(BASS_URL, key);
+const scrollWindow = new ScrollWindow();
+const imagesApiService = new ImagesApiService();
 
 bodyRef.insertAdjacentHTML('afterbegin', formTpl());
 const ref = {
@@ -18,21 +16,36 @@ const ref = {
 };
 bodyRef.insertAdjacentHTML('beforeend', gallery());
 ref.form.addEventListener('submit', searchImage);
+const loadMoreRef = document.querySelector('.load-more');
+loadMoreRef.addEventListener('click', onLoadMore);
+
+function onLoadMore() {
+  return imagesApiService.fetchImages().then(images => {
+    scrollWindow.galleryH = galleryRef.scrollHeight;
+    appendImagesMarkup(images);
+
+    scrollWindow.scroll();
+  });
+}
 
 function searchImage(e) {
   e.preventDefault();
-
-  const category = e.currentTarget.query.value;
-
-  return imagesApiService.fetchImages(category).then(images => {
-    renderImages(images);
+  clearImageContainer();
+  imagesApiService.query = e.currentTarget.query.value;
+  imagesApiService.resetPage();
+  imagesApiService.fetchImages().then(images => {
+    appendImagesMarkup(images);
+    // scrollWindow.hight = galleryRef.scrollHeight;
   });
 }
-const galleryRef = document.querySelector('.gallery');
-function renderImages(images) {
-  console.log(images);
 
+const galleryRef = document.querySelector('.gallery');
+
+function appendImagesMarkup(images) {
   galleryRef.insertAdjacentHTML('beforeend', imageTpl(images));
+  console.dir(galleryRef.scrollHeight);
 }
-// console.log(ref.form);
-// console.log(imagesApiService.fetchImages());
+
+function clearImageContainer() {
+  galleryRef.innerHTML = '';
+}
