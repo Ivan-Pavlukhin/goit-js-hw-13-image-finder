@@ -4,6 +4,9 @@ import ScrollWindow from './scripts/windowAutoScroll';
 import formTpl from './handelbars/form-markup.hbs';
 import gallery from './handelbars/gallery-markup.hbs';
 import imageTpl from './handelbars/image-markup.hbs';
+const basicLightbox = require('basiclightbox');
+// import * as basicLightbox from 'basiclightbox';
+
 const scrollWindow = new ScrollWindow();
 const imagesApiService = new ImagesApiService();
 const bodyRef = document.querySelector('body');
@@ -16,6 +19,11 @@ const observerHandler = function (entries) {
 const observerOptions = {
   rootMargin: '300px',
 };
+
+// const instance = basicLightbox.create(`
+// 	<h1>Dynamic Content</h1>
+// 	<p>You can set the content of the lightbox with JS.</p>
+// `);
 
 bodyRef.insertAdjacentHTML('afterbegin', formTpl());
 bodyRef.insertAdjacentHTML('beforeend', gallery());
@@ -59,3 +67,19 @@ function appendImagesMarkup(images) {
 function clearImageContainer() {
   ref.gallery.innerHTML = '';
 }
+
+ref.gallery.addEventListener('click', onOpenImg);
+
+function onOpenImg(event) {
+  if (event.target.src) {
+    const src = event.target.getAttribute('data-fullFormat');
+    const instance = basicLightbox.create(`
+    <img src="${src}" width="800" height="600">
+`);
+    instance.show();
+    console.dir(event.target);
+  }
+}
+
+// instance.show();
+// instance.close();
