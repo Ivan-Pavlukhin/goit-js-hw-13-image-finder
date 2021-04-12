@@ -4,6 +4,9 @@ import ScrollWindow from './scripts/windowAutoScroll';
 import formTpl from './handelbars/form-markup.hbs';
 import gallery from './handelbars/gallery-markup.hbs';
 import imageTpl from './handelbars/image-markup.hbs';
+import '@pnotify/core/dist/BrightTheme.css';
+const { defaults } = require('@pnotify/core');
+const { alert, notice, info, success, error } = require('@pnotify/core');
 const basicLightbox = require('basiclightbox');
 // import * as basicLightbox from 'basiclightbox';
 
@@ -54,10 +57,19 @@ function searchImage(e) {
   clearImageContainer();
   imagesApiService.query = e.currentTarget.query.value;
   imagesApiService.resetPage();
-  imagesApiService.fetchImages().then(images => {
-    appendImagesMarkup(images);
-    observer.observe(document.querySelector('.load-more'));
-  });
+  imagesApiService
+    .fetchImages()
+    .then(data => {
+      return data.hits;
+    })
+    .then(images => {
+      appendImagesMarkup(images);
+
+      observer.observe(document.querySelector('.load-more'));
+    })
+    .catch(er => {
+      error('Error');
+    });
 }
 
 function appendImagesMarkup(images) {
