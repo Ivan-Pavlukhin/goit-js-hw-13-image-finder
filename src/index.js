@@ -78,7 +78,7 @@ function onOpenImg(event) {
   }
   const src = event.target.getAttribute('data-fullFormat');
   const instance = basicLightbox.create(`
-    <img src="${src}" width="800" height="600">
+    <img src="${src}" height="600">
 `);
   instance.show();
   console.dir(event.target);
