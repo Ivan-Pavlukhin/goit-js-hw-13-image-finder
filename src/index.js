@@ -16,17 +16,12 @@ const bodyRef = document.querySelector('body');
 
 const observerHandler = function (entries) {
   if (entries[entries.length - 1].isIntersecting) {
-    onLoadMore();
+    getImg();
   }
 };
 const observerOptions = {
   rootMargin: '300px',
 };
-
-// const instance = basicLightbox.create(`
-// 	<h1>Dynamic Content</h1>
-// 	<p>You can set the content of the lightbox with JS.</p>
-// `);
 
 bodyRef.insertAdjacentHTML('afterbegin', formTpl());
 bodyRef.insertAdjacentHTML('beforeend', gallery());
@@ -43,20 +38,15 @@ ref.form.addEventListener('submit', searchImage);
 
 const observer = new IntersectionObserver(observerHandler, observerOptions);
 
-function onLoadMore() {
-  return imagesApiService.fetchImages().then(images => {
-    scrollWindow.galleryH = ref.gallery.scrollHeight;
-    appendImagesMarkup(images);
-
-    // scrollWindow.scroll();
-  });
-}
-
 function searchImage(e) {
   e.preventDefault();
   clearImageContainer();
   imagesApiService.query = e.currentTarget.query.value;
   imagesApiService.resetPage();
+  getImg();
+}
+
+function getImg() {
   imagesApiService
     .fetchImages()
     .then(data => {
@@ -83,14 +73,15 @@ function clearImageContainer() {
 ref.gallery.addEventListener('click', onOpenImg);
 
 function onOpenImg(event) {
-  if (event.target.src) {
-    const src = event.target.getAttribute('data-fullFormat');
-    const instance = basicLightbox.create(`
+  if (!event.target.nodeName === 'IMG') {
+    return;
+  }
+  const src = event.target.getAttribute('data-fullFormat');
+  const instance = basicLightbox.create(`
     <img src="${src}" width="800" height="600">
 `);
-    instance.show();
-    console.dir(event.target);
-  }
+  instance.show();
+  console.dir(event.target);
 }
 
 // instance.show();
