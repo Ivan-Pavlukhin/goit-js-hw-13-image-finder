@@ -46,20 +46,14 @@ function searchImage(e) {
   getImg();
 }
 
-function getImg() {
-  imagesApiService
-    .fetchImages()
-    .then(data => {
-      return data.hits;
-    })
-    .then(images => {
-      appendImagesMarkup(images);
-
-      observer.observe(document.querySelector('.load-more'));
-    })
-    .catch(er => {
-      error('Error');
-    });
+async function getImg() {
+  try {
+    const images = await imagesApiService.fetchImages();
+    appendImagesMarkup(images.hits);
+    observer.observe(document.querySelector('.load-more'));
+  } catch (er) {
+    error('Error');
+  }
 }
 
 function appendImagesMarkup(images) {
@@ -83,6 +77,24 @@ function onOpenImg(event) {
   instance.show();
   console.dir(event.target);
 }
+
+// example with then.
+
+// function getImg() {
+//   imagesApiService
+//     .fetchImages()
+//     .then(data => {
+//       return data.hits;
+//     })
+//     .then(images => {
+//       appendImagesMarkup(images);
+
+//       observer.observe(document.querySelector('.load-more'));
+//     })
+//     .catch(er => {
+//       error('Error');
+//     });
+// }
 
 // instance.show();
 // instance.close();
